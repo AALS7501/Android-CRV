@@ -22,13 +22,6 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -52,8 +45,6 @@ public class UsermainActivity extends AppCompatActivity implements VotelistAdapt
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager layoutManager;
     private ArrayList<Votedetail> votelist;
-    private FirebaseDatabase database;
-    private DatabaseReference databaseReference;
 
     Toolbar toolbar;
 
@@ -93,15 +84,10 @@ public class UsermainActivity extends AppCompatActivity implements VotelistAdapt
         adapter = new VotelistAdapter(votelist, this, this);
         recyclerView.setAdapter(adapter); // 리사이클러뷰에 어댑터 연결
         recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));  // 투표목록 구분선
-
-        database = FirebaseDatabase.getInstance(); // 파이어베이스 데이터베이스 연동
         votelist.clear();
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();        // user id 확인 및 설정
-        if(user != null) {
-            user_id = user.getEmail().split("@")[0];
-            Log.d("user_id", user_id);
-        }
 
+        Intent getintent = getIntent();
+        user_id = (String) getintent.getExtras().get("user_id");
 
     }
 
@@ -168,7 +154,7 @@ public class UsermainActivity extends AppCompatActivity implements VotelistAdapt
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        FirebaseAuth.getInstance().signOut(); // 로그아웃(firebase 로그인 연동)
+
     }
 
     // recyclerview 투표 선택시 투표 화면 이동
@@ -222,52 +208,7 @@ public class UsermainActivity extends AppCompatActivity implements VotelistAdapt
         }
         return true;
     }
-    // firebase DB
-//    private void ReadDB(String DB_path){
-//        if (DB_path == "User") {
-//            databaseReference = database.getReference(DB_path); // DB 테이블 연결 - user data 확인(votelist)
-//            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                    User user = dataSnapshot.child(user_id).getValue(User.class);
-//                    votelist = user.getVotelist().split(",");
-//                    Log.d("votelist", votelist[0] + votelist[1]);
-//                }
-//
-//                @Override
-//                public void onCancelled(@NonNull DatabaseError databaseError) {
-//                    // DB를 가져오던 중 에러 발생시
-//                    Log.e("UsermainActivity", String.valueOf(databaseError.toException()));
-//                }
-//            });
-//        } else if(DB_path == "Votelist") {
-//            arrayList.clear(); // 기존 배열 초기화
-//            for(String title : votelist) {
-//                Log.d("title", title);
-//                databaseReference = database.getReference(DB_path+"/"+title); // DB 테이블 연결 - user data 확인(votelist)
-//                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                        // 파이어베이스 데이터베이스의 데이터를 받아오는 함수
-//                        Votedetail votedetail = dataSnapshot.getValue(Votedetail.class);
-//                        Log.d("votedetail", votedetail.getTitle());
-//                        arrayList.add(votedetail);
-//
-//                        adapter.notifyDataSetChanged(); // 리스트 저장 및 새로고침
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(@NonNull DatabaseError databaseError) {
-//                        // DB를 가져오던 중 에러 발생시
-//                        Log.e("VoterActivity", String.valueOf(databaseError.toException()));
-//                    }
-//                });
-//            }
-//
-//            adapter = new VotelistAdapter(arrayList, this, this);
-//            recyclerView.setAdapter(adapter); // 리사이클러뷰에 어댑터 연결
-//        }
-//    }
+
 
     // Mysql DB
     private class DB_check extends AsyncTask<String, Void, String> {

@@ -32,11 +32,6 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -49,7 +44,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.Socket;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.text.ParseException;
@@ -83,12 +78,9 @@ public class VoteActivity extends AppCompatActivity implements IngCandidateAdapt
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager layoutManager;
     private ArrayList<Candidate> candidates;
-    private FirebaseDatabase database;
-    private DatabaseReference databaseReference;
 
 
     private Handler mHandler;
-    private Socket socket;
     private DataOutputStream dos;
     private DataInputStream dis;
     private String id_check_status = "";
@@ -238,8 +230,14 @@ public class VoteActivity extends AppCompatActivity implements IngCandidateAdapt
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             String sk = et_pwd.getText().toString();
-                            connect("vote");
-                            Toast.makeText(getApplicationContext(), "투표 완료", Toast.LENGTH_SHORT).show();
+                            //connect("vote");
+                            String voted_status=null;
+                            try {
+                                voted_status = new connect().execute("vote").get();
+
+                            } catch (Exception e){}
+
+                            Toast.makeText(getApplicationContext(), voted_status, Toast.LENGTH_SHORT).show();
                             finish();
                         }
                     }).setNegativeButton("아니오", new DialogInterface.OnClickListener() {
@@ -268,10 +266,18 @@ public class VoteActivity extends AppCompatActivity implements IngCandidateAdapt
                                 values.put("voted", "0");
 //                                db.insert("pk", null, values);
 
-                                connect("register_key");
+                                //connect("register_key");
+                                try {
+                                    id_check_status = new connect().execute("register_key", user_id, tv_votedetailtitle.getText().toString(), pk, Boolean.toString(real_key)).get();
+                                } catch (Exception e){}
+
                                 if(id_check_status.equals("succ")) {
                                     Toast.makeText(getApplicationContext(), "키 등록 완료", Toast.LENGTH_SHORT).show();
-                                } else {
+                                }
+                                else if(id_check_status.equals("done")){
+                                    Toast.makeText(getApplicationContext(), "already registered", Toast.LENGTH_SHORT).show();
+                                }
+                                else {
                                     Toast.makeText(getApplicationContext(), "키 등록 실패", Toast.LENGTH_SHORT).show();
                                 }
 
@@ -351,8 +357,9 @@ public class VoteActivity extends AppCompatActivity implements IngCandidateAdapt
                             values.put("salt", random_salt);
                             values.put("voted", "0");
 //                            db.insert("pk", null, values);
-
-                            connect("register_key");
+                            try {
+                                id_check_status = new connect().execute("register_key", user_id, tv_votedetailtitle.getText().toString(), pk, Boolean.toString(real_key)).get();
+                            } catch (Exception e){}
                             if(id_check_status.equals("succ")) {
                                 Toast.makeText(getApplicationContext(), "키 등록 완료", Toast.LENGTH_SHORT).show();
                             } else {
@@ -372,72 +379,87 @@ public class VoteActivity extends AppCompatActivity implements IngCandidateAdapt
         return true;
     }
 
-    private void connect(final String connect_type){
-        mHandler = new Handler();
-        Thread checkUpdate = new Thread() {
-            public void run() {
+    class connect extends AsyncTask<String, String, String> { ////php
+        String sendMsg, receiveMsg;
+
+        @Override
+        protected String doInBackground(String... strings) {
+            if (strings[0].equals("register")) {
                 try {
-                    socket = new Socket(ip, port);
-                    Log.d("서버 접속됨", "서버 접속됨");
+                    String str;
+                    URL url = new URL("http://222.111.165.26:8080/vote_mobile.php");
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                    conn.setRequestMethod("POST");
+                    conn.setDoInput(true);
+                    conn.connect();
+
+                    sendMsg = "mode=" + strings[0] + "&user_id=" + strings[1] + "&vote_title=" + strings[2] + "&publickey=" + strings[3] + "&real=" + strings[4];
+                    Log.d("send msg", sendMsg);
+                    OutputStream outs = conn.getOutputStream();
+                    outs.write(sendMsg.getBytes("UTF-8"));
+                    outs.flush();
+                    outs.close();
+
+                    if (conn.getResponseCode() == conn.HTTP_OK) {
+                        InputStreamReader tmp = new InputStreamReader(conn.getInputStream(), "UTF-8");
+                        BufferedReader reader = new BufferedReader(tmp);
+                        StringBuffer buffer = new StringBuffer();
+                        while ((str = reader.readLine()) != null) {
+                            buffer.append(str);
+                        }
+                        receiveMsg = buffer.toString();
+                        Log.d("received message", receiveMsg);
+                    } else {
+                        Log.i("통신 결과", conn.getResponseCode() + "에러");
+                    }
+
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
+            } else if (strings[0].equals("vote")) {
                 try {
-                    dos = new DataOutputStream(socket.getOutputStream());   // output에 보낼꺼 넣음
-                    dis = new DataInputStream(socket.getInputStream());     // input에 받을꺼 넣어짐
+                    String str;
+                    URL url = new URL("http://222.111.165.26:8080/vote_mobile.php");
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                    conn.setRequestMethod("POST");
+                    conn.setDoInput(true);
+                    conn.connect();
 
-                    if(connect_type == "vote") {
-                        dos.writeUTF(connect_type);
-                        dos.writeUTF(tv_votedetailtitle.getText().toString() + "," + voted_position + "," + user_id);
-                        Log.d("data sending :", "title");
-//                    dos.writeInt(voted_position);
-//                    Log.d("data sending :", "position");
+                    sendMsg = "mode=" + strings[0];
+                    Log.d("send msg", sendMsg);
+                    OutputStream outs = conn.getOutputStream();
+                    outs.write(sendMsg.getBytes("UTF-8"));
+                    outs.flush();
+                    outs.close();
 
-                        byte[] read_data = new byte[4];
-                        dis.read(read_data);
-                        id_check_status = new String(read_data);
-
-                        Log.d("tag_id_check_status", id_check_status);
-                        if(id_check_status.equals("succ")){
-                            Intent intent = new Intent();
-                            setResult(RESULT_OK, intent);
-                            intent.putExtra("title", tv_votedetailtitle.getText());
-                            intent.putExtra("voted", voted);
+                    if (conn.getResponseCode() == conn.HTTP_OK) {
+                        InputStreamReader tmp = new InputStreamReader(conn.getInputStream(), "UTF-8");
+                        BufferedReader reader = new BufferedReader(tmp);
+                        StringBuffer buffer = new StringBuffer();
+                        while ((str = reader.readLine()) != null) {
+                            buffer.append(str);
                         }
-
-                    } else if(connect_type == "register_key"){
-                        dos.writeUTF(connect_type);
-                        dos.writeUTF(user_id+","+values.get("vote_id")+","+values.get("pub_key")+","+real_key);
-
-                        byte[] read_data = new byte[4];
-                        dis.read(read_data);
-                        id_check_status = new String(read_data);
-                        if(id_check_status.equals("succ")){
-                            db.insert("pk", null, values);
-                        }
-                        // insert DB check
-                        Cursor c = db.rawQuery("select * from pk;", null);
-                        if (c.moveToFirst()) {
-                            while (!c.isAfterLast()) {
-                                Log.d("TAG_READ_pk", "pk ::" + c.getString(c.getColumnIndex("pub_key")) + "//slat ::" + c.getInt(c.getColumnIndex("salt")));
-                                c.moveToNext();
-                            }
-                        }
+                        receiveMsg = buffer.toString();
+                        Log.d("received message", receiveMsg);
+                    } else {
+                        Log.i("통신 결과", conn.getResponseCode() + "에러");
                     }
 
-                } catch (Exception e) {
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
-        };
-        checkUpdate.start();
-
-        try {
-            checkUpdate.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            return receiveMsg;
         }
     }
+
 
     // Mysql DB
     private class DB_check extends AsyncTask<String, Void, String> {
@@ -500,6 +522,7 @@ public class VoteActivity extends AppCompatActivity implements IngCandidateAdapt
                 return new String("Error: " + e.getMessage());
             }
         }
+
 
         @Override
         protected void onPostExecute(String s) {

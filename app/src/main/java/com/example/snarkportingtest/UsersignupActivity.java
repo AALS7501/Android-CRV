@@ -40,7 +40,7 @@ import java.util.regex.Pattern;
 import static com.example.snarkportingtest.MainActivity.ip;
 import static com.example.snarkportingtest.MainActivity.port;
 
-// firebase 아이디 중복 확인 추가 필요
+// 아이디 중복 확인 추가 필요
 public class UsersignupActivity extends AppCompatActivity {
 
     EditText et_signupid;
@@ -178,7 +178,7 @@ public class UsersignupActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "본인인증이 필요합니다", Toast.LENGTH_SHORT).show();
                 }
                 else {
-                    SignUp("signup"); // firebase 연동 회원가입 함수
+                    SignUp("signup"); // 연동 회원가입 함수
                 }
             }
         });
@@ -322,7 +322,7 @@ public class UsersignupActivity extends AppCompatActivity {
         }
     }
 
-    // firebase 연동 회원가입
+    // 연동 회원가입
     private void SignUp(String mode) {
         String email = ((EditText) findViewById(R.id.et_signupid)).getText().toString().toLowerCase();
         String password = ((EditText) findViewById(R.id.et_signuppwd)).getText().toString();

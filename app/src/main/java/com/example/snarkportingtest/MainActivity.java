@@ -48,7 +48,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.Socket;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
@@ -96,7 +95,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     private Handler mHandler;
-    private Socket socket;
     private DataOutputStream dos;
     private DataInputStream dis;
 
@@ -139,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
 
                             Intent intent = new Intent(MainActivity.this, UsermainActivity.class);
                             str = et_id.getText().toString();
-                            intent.putExtra("str", str);
+                            intent.putExtra("user_id", str);
                             startActivity(intent);
 
                         } else {
