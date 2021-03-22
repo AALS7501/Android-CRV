@@ -325,3 +325,6 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+.project
+.settings/
+src/main/res/raw/
