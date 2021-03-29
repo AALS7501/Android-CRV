@@ -6,12 +6,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.FileOutputStream;
+import java.lang.Object;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -123,6 +125,7 @@ public class SubActivity extends AppCompatActivity {
 //        tv.setText(result);
 
         final String result = stringFromJNI(task, mode, loc);
+
 
 //        progressDialog.dismiss();
         AlertDialog.Builder builder = new AlertDialog.Builder(SubActivity.this);

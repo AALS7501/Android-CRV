@@ -54,6 +54,7 @@ import java.util.Date;
 
 import static com.example.snarkportingtest.MainActivity.ip;
 import static com.example.snarkportingtest.MainActivity.port;
+import makeinputs.voteInput;
 
 public class VoteActivity extends AppCompatActivity implements IngCandidateAdapter.OnItemClickListener {
 
@@ -114,11 +115,23 @@ public class VoteActivity extends AppCompatActivity implements IngCandidateAdapt
 
         setSupportActionBar(toolbar);
 
+
+
         Intent getintent = getIntent();
         user_id = (String) getintent.getExtras().get("user_id");
         Votedetail votedetail = (Votedetail) getintent.getExtras().get("vote");
 
         vote_id = votedetail.getVote_id();
+
+        Intent inputintent = new Intent(VoteActivity.this, makevoteinput.class);
+        inputintent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        inputintent.putExtra("param","e_id");
+        String[] in = new String[8];
+        for(int i = 0 ; i < 8 ; i++)
+            in[i] = Integer.toString(0);
+        in[7] = Integer.toString(vote_id);
+        inputintent.putExtra("values",in);
+        startActivity(inputintent);
 
         rv_votecandidatelist.setHasFixedSize(true); // 리사이클러뷰 기존성능 강화
         rv_votecandidatelist.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));  // 투표목록 구분선
@@ -234,7 +247,7 @@ public class VoteActivity extends AppCompatActivity implements IngCandidateAdapt
                             String voted_status=null;
                             try {
                                 voted_status = new connect().execute("vote").get();
-
+                                //여기에 투표 enc 넣어야함
                             } catch (Exception e){}
 
                             Toast.makeText(getApplicationContext(), voted_status, Toast.LENGTH_SHORT).show();
@@ -296,6 +309,8 @@ public class VoteActivity extends AppCompatActivity implements IngCandidateAdapt
         });
 
     }
+
+
 
     @Override
     public void onItemClick(int position) {

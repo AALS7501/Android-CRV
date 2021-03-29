@@ -50,6 +50,7 @@
         <activity android:name=".UsermainActivity" />
         <activity android:name=".AdminActivity" />
         <activity android:name=".SubActivity" />
+        <activity android:name=".makevoteinput" />
         <!--
  Set custom default icon. This is used when no icon is set for incoming notification messages.
      See README(https://goo.gl/l4GJaQ) for more.

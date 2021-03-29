@@ -89,6 +89,11 @@ public class UsermainActivity extends AppCompatActivity implements VotelistAdapt
         Intent getintent = getIntent();
         user_id = (String) getintent.getExtras().get("user_id");
 
+        Intent makeinput = new Intent(UsermainActivity.this, makevoteinput.class);
+        makeinput.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        makeinput.putExtra("param", "PP");
+        startActivity(makeinput);
+
     }
 
     @Override
@@ -120,28 +125,28 @@ public class UsermainActivity extends AppCompatActivity implements VotelistAdapt
         votelist.clear();
         vote_id_list.clear();
 
-        Cursor c = db.rawQuery("select * from votelist;", null);
-        if(c.moveToFirst()) {
-            while(!c.isAfterLast()){
-                Log.d("TAG_READ_votelist", "" + c.getInt(c.getColumnIndex("vote_id")));
-                vote_id_list.add(c.getInt(c.getColumnIndex("vote_id")));        // server DB와 비교하기 위함
-
-                Votedetail votedetail = new Votedetail();
-                votedetail.setVote_id(c.getInt(c.getColumnIndex("vote_id")));
-                votedetail.setTitle(c.getString(c.getColumnIndex("title")));
-                votedetail.setCreated(c.getString(c.getColumnIndex("admin")));
-                votedetail.setStart(c.getString(c.getColumnIndex("start_date")));
-                votedetail.setEnd(c.getString(c.getColumnIndex("end_date")));
-                votedetail.setType(c.getString(c.getColumnIndex("type")));
-                votedetail.setNote(c.getString(c.getColumnIndex("note")));
-
-                votelist.add(votedetail);       // 현재 폰 DB에 있는 투표정보
-                adapter.notifyDataSetChanged(); // 리스트 저장 및 새로고침
-                c.moveToNext();
-            }
-//                    Log.d("Tag_sql", "제발"+vote_id_list.toString());
-        }
-        Log.d("TAG_SQLITE", "suc");
+//        Cursor c = db.rawQuery("select * from votelist;", null);
+//        if(c.moveToFirst()) {
+//            while(!c.isAfterLast()){
+//                Log.d("TAG_READ_votelist", "" + c.getInt(c.getColumnIndex("vote_id")));
+//                vote_id_list.add(c.getInt(c.getColumnIndex("vote_id")));        // server DB와 비교하기 위함
+//
+//                Votedetail votedetail = new Votedetail();
+//                votedetail.setVote_id(c.getInt(c.getColumnIndex("vote_id")));
+//                votedetail.setTitle(c.getString(c.getColumnIndex("title")));
+//                votedetail.setCreated(c.getString(c.getColumnIndex("admin")));
+//                votedetail.setStart(c.getString(c.getColumnIndex("start_date")));
+//                votedetail.setEnd(c.getString(c.getColumnIndex("end_date")));
+//                votedetail.setType(c.getString(c.getColumnIndex("type")));
+//                votedetail.setNote(c.getString(c.getColumnIndex("note")));
+//
+//                votelist.add(votedetail);       // 현재 폰 DB에 있는 투표정보
+//                adapter.notifyDataSetChanged(); // 리스트 저장 및 새로고침
+//                c.moveToNext();
+//            }
+////                    Log.d("Tag_sql", "제발"+vote_id_list.toString());
+//        }
+//        Log.d("TAG_SQLITE", "suc");
 
         // Mysql DB connect - Read votelist
         DB_check task = new DB_check();
@@ -165,6 +170,8 @@ public class UsermainActivity extends AppCompatActivity implements VotelistAdapt
         intent.putExtra("user_id", user_id);
         intent.putExtra("vote", votedetail);
         startActivityForResult(intent, REQUEST_CODE);
+
+
     }
 
     // 투표 화면에서 돌아올 때(toastbox)

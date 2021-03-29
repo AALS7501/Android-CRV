@@ -46,6 +46,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -179,45 +180,61 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // DB 확인용
         btn_db.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, makevoteinput.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putExtra("param","e_id");
+                String[] in = new String[8];
+                for(int i = 0 ; i < 8 ; i++)
+                    in[i] = Integer.toString(0);
+                in[7] = Integer.toString(1);
 
-                int random_salt = (int)(Math.random() * 1000);
-                Log.d("tag_salt", ""+random_salt);
-
-                DBHelper helper;
-                helper = new DBHelper(getApplicationContext(), "userdb.db",null, 1);
-                db = helper.getWritableDatabase();
-                helper.onUpgrade(db,1,1);
-                //for test
-                if(i==0) {
-                    helper.onUpgrade(db,1,1);
-                    ContentValues values = new ContentValues();
-                    values.put("vote_id", 1);
-                    values.put("pub_key", "test_pk_1");
-                    values.put("salt", random_salt);
-                    values.put("voted", "0");
-                    db.insert("pk", null, values);
-                    i++;
-                }
-
-//
-                Cursor c = db.rawQuery("select * from pk;", null);
-                if(c.getCount()>0) {
-                    Log.d("tag_pkcheck", ""+c.getCount());
-                } else {
-                    Log.d("tag_pkcheck", "nothing");
-                }
-                if(c.moveToFirst()) {
-                    while(!c.isAfterLast()){
-                        Log.d("TAG_READ_pk", "" + c.getInt(c.getColumnIndex("salt")));
-                        c.moveToNext();
-                    }
-                }
+                intent.putExtra("values",in);
+                startActivity(intent);
             }
         });
+
+        // DB 확인용
+//        btn_db.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//                int random_salt = (int)(Math.random() * 1000);
+//                Log.d("tag_salt", ""+random_salt);
+//
+//                DBHelper helper;
+//                helper = new DBHelper(getApplicationContext(), "userdb.db",null, 1);
+//                db = helper.getWritableDatabase();
+//                helper.onUpgrade(db,1,1);
+//                //for test
+//                if(i==0) {
+//                    helper.onUpgrade(db,1,1);
+//                    ContentValues values = new ContentValues();
+//                    values.put("vote_id", 1);
+//                    values.put("pub_key", "test_pk_1");
+//                    values.put("salt", random_salt);
+//                    values.put("voted", "0");
+//                    db.insert("pk", null, values);
+//                    i++;
+//                }
+//
+////
+//                Cursor c = db.rawQuery("select * from pk;", null);
+//                if(c.getCount()>0) {
+//                    Log.d("tag_pkcheck", ""+c.getCount());
+//                } else {
+//                    Log.d("tag_pkcheck", "nothing");
+//                }
+//                if(c.moveToFirst()) {
+//                    while(!c.isAfterLast()){
+//                        Log.d("TAG_READ_pk", "" + c.getInt(c.getColumnIndex("salt")));
+//                        c.moveToNext();
+//                    }
+//                }
+//            }
+//        });
     }
 
     @Override
