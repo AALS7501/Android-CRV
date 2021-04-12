@@ -241,7 +241,7 @@ void CircuitReader::constructCircuit(char* arithFilepath) {
 
 
 	unsigned int i;
-    LOGD("%d %d %d", numInputs, numOutputs, numNizkInputs);
+    //LOGD("%d %d %d", numInputs, numOutputs, numNizkInputs);
 
 	currentVariableIdx = currentLinearCombinationIdx = 0;
 	for (i = 0; i < numInputs; i++) {
@@ -283,7 +283,7 @@ void CircuitReader::constructCircuit(char* arithFilepath) {
 	int lineCount = 0;
 	while (getline(ifs2, line)) {
 		lineCount++;
-		LOGD("%d : %s", lineCount, line.c_str());
+
 //		if (lineCount % 100000 == 0) {
 //			LOGD("At Line:: %d\n", lineCount);
 //		}

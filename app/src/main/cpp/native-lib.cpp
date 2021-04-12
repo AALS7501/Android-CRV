@@ -115,12 +115,11 @@ Java_com_example_snarkportingtest_SubActivity_stringFromJNI(
             // The following code makes use of the observation that
             // libsnark::default_r1cs_gg_ppzksnark_pp is the same as libff::default_ec_pp (see r1cs_gg_ppzksnark_pp.hpp)
             // otherwise, the following code won't work properly, as GadgetLib2 is hardcoded to use libff::default_ec_pp.
-            successBit = libsnark::run_r1cs_gg_ppzksnark_verify<libsnark::default_r1cs_gg_ppzksnark_pp>(
-                    example, test_serialization, name);
+            successBit = libsnark::run_r1cs_gg_ppzksnark_verify<libsnark::default_r1cs_gg_ppzksnark_pp>(example, test_serialization, name);
 
         if(!successBit){
             LOGD("Problem occurred while running the ppzksnark algorithms .. ");
-
+            return env->NewStringUTF("0");
         }
 
     }
@@ -135,6 +134,14 @@ Java_com_example_snarkportingtest_SubActivity_stringFromJNI(
                     example, test_serialization, name);
 
     }
+    else if(strcmp(mode_, "setuprun") == 0)
+    {
+        LOGD("setuprun");
+
+        libsnark::run_r1cs_gg_ppzksnark_setup<libsnark::default_r1cs_gg_ppzksnark_pp>(example, test_serialization, name);
+        libsnark::run_r1cs_gg_ppzksnark<libsnark::default_r1cs_gg_ppzksnark_pp>(example, test_serialization, name);
+
+    }
     else if(strcmp(mode_, "all") == 0) {
         LOGD("all");
 
@@ -144,10 +151,12 @@ Java_com_example_snarkportingtest_SubActivity_stringFromJNI(
 
         if (!successBit) {
             LOGD("Problem occurred while running the ppzksnark algorithms .. " );
-
+            return env->NewStringUTF("0");
         }
 
     }
 
+
     return env->NewStringUTF("1");
+
 }

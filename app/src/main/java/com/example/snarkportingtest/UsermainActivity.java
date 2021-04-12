@@ -336,7 +336,7 @@ public class UsermainActivity extends AppCompatActivity implements VotelistAdapt
                 if(c.moveToFirst()) {
                     while(!c.isAfterLast()){
                         int vote_id;
-                        Log.d("TAG_READ_usermain", "" + c.getInt(c.getColumnIndex("vote_id")) + c.getString(c.getColumnIndex("title")));
+//                        Log.d("TAG_READ_usermain", "" + c.getInt(c.getColumnIndex("vote_id")) + c.getString(c.getColumnIndex("title")));
                         c.moveToNext();
                     }
                 }

@@ -175,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, SubActivity.class);
                 intent.putExtra("task","vote");
-                intent.putExtra("mode","all");
+                intent.putExtra("mode","verify");
                 startActivityForResult(intent, SNARK_CODE);
             }
         });
